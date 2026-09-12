@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Company {
+  id             Int            @id @default(autoincrement())
+  name           String
+  normalizedName String         @unique
+  compensations  Compensation[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([name])
+}
+
+model Role {
+  id             Int            @id @default(autoincrement())
+  name           String
+  normalizedName String         @unique
+  compensations  Compensation[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([name])
+}
+
+model Level {
+  id            Int            @id @default(autoincrement())
+  name          String         @unique
+  compensations Compensation[]
+  createdAt     DateTime       @default(now())
+}
+
+model Location {
+  id            Int            @id @default(autoincrement())
+  country       String
+  city          String
+  compensations Compensation[]
+  createdAt     DateTime       @default(now())
+
+  @@index([country, city])
+  @@unique([country, city])
+}
+
+model Compensation {
+  id         Int @id @default(autoincrement())
+  companyId  Int
+  roleId     Int
+  levelId    Int
+  locationId Int
+
+  baseSalary        Decimal
+  bonus             Decimal @default(0)
+  stock             Decimal @default(0)
+  totalCompensation Decimal
+
+  currency String
+  source   String
+
+  company  Company  @relation(fields: [companyId], references: [id])
+  role     Role     @relation(fields: [roleId], references: [id])
+  level    Level    @relation(fields: [levelId], references: [id])
+  location Location @relation(fields: [locationId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([companyId])
+  @@index([roleId])
+  @@index([levelId])
+  @@index([locationId])
+  @@index([currency])
+  @@index([companyId, roleId, levelId])
+}
